@@ -44,7 +44,22 @@ While True:
 ### Website
 Use generator.
 if you are using Django you can use *HttpResponse*
-for flask you can use *Response*
+### flask you can use *Response* I did:
+
+`
+@app.route('/direct-stream')
+def stream_direct():
+  def generate():
+    while True:
+      cam = MjpegParser(url='http://192.168.1.250/videostream.cgi?user=admin&pwd=password&resolution=8&rate=0').serve()
+      yield '--ipcamera\r\n'
+      yield 'Content-Length:' + str(cam.len) + '\r\n'
+      yield 'Content-Type: image/jpeg\r\n'
+      yield '\r\n'
+      yield cam.read()
+
+  return Response(generate())
+  `
 
 
 CHANGELOG
@@ -53,3 +68,7 @@ JUL 10 :
 - server renamed to mjpegtools
 - updated readme => usage , installation
 - registered on
+
+MILESTONE :
+- implement a server (I have it in my private repo)
+- option to convert realtime to other format.
