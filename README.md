@@ -49,16 +49,21 @@ if you are using Django you can use *HttpResponse*
 `
 @app.route('/direct-stream')
 def stream_direct():
+  cam = MjpegParser(url='http://youripadress/videostream.cgi?user=admin&pwd=password&resolution=8&rate=0')
+  cam.quality = 20
   def generate():
     while True:
-      cam = MjpegParser(url='http://192.168.1.250/videostream.cgi?user=admin&pwd=password&resolution=8&rate=0').serve()
+      c = cam.serve()
+      # yield cam.data # you can use this if you are not manipulating the image
+      yield '\r\n'
       yield '--ipcamera\r\n'
-      yield 'Content-Length:' + str(cam.len) + '\r\n'
+      yield 'Content-Length: ' + str(cam.length) + '\r\n'
       yield 'Content-Type: image/jpeg\r\n'
       yield '\r\n'
-      yield cam.read()
+      yield c.read()
 
-  return Response(generate())
+  resp = Response(generate(), mimetype='image/jpeg',content_type='multipart/x-mixed-replace;boundary=ipcamera',direct_passthrough=True)
+  return resp
   `
 
 
