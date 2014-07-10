@@ -7,7 +7,7 @@ import StringIO
 from PIL import Image
 
 class MjpegParser(object):
-  def __init__(self, **kwargs):
+  def __init__(self, url, **kwargs):
     # for now it's always true
     self.pil = True
     self.quality = 50
