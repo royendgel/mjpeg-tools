@@ -4,8 +4,6 @@ import re
 import time
 import StringIO
 
-from PIL import Image
-
 class MjpegParser(object):
   def __init__(self, url, **kwargs):
     # for now it's always true
@@ -16,6 +14,10 @@ class MjpegParser(object):
     self.length = 0
     # mimic the same data
     self.data = ''
+    self.headers = self.get_headers()
+
+  def get_headers(self):
+    return '\r\n' + '--ipcamera\r\n' + 'Content-Length: ' + str(self.length) +  '\r\n' + 'Content-Type: image/jpeg\r\n' + '\r\n'
 
   def serve(self):
     while True:
@@ -31,13 +33,39 @@ class MjpegParser(object):
             self.length = content_length
         content = self.input.readline()
         data = self.input.read(content_length)
-        self.data += content
+        self.data += content # Slow need to use join instead (pep8 Style)
 
       if self.pil:
-          output = StringIO.StringIO()
+          from PIL import Image
+          self.output = StringIO.StringIO()
           im = Image.open(io.BytesIO(data))
-          im.save(output, format=self.format, quality=self.quality)
-          output.seek(0)
+          im.save(self.output, format=self.format, quality=self.quality)
+          self.output.seek(0)
           # it return file-like object in memory
-          self.length = output.len
-          return output
+          self.length = self.output.len
+          return self
+
+  def as_mjpeg(self):
+    def generate():
+      while True:
+        cam = self.serve()
+        c = cam.output
+        yield self.get_headers()
+        yield c.read()
+    return generate()
+
+  def as_flask_mjpeg(self):
+    def generate():
+      while True:
+        cam = self.serve()
+        c = cam.output
+        yield self.get_headers()
+        yield c.read()
+    from flask import Response
+    resp = Response(generate(), mimetype='image/jpeg',\
+    content_type='multipart/x-mixed-replace;boundary=ipcamera',\
+    direct_passthrough=True)
+    return resp
+
+  def as_image(self):
+    return self.output
