@@ -56,9 +56,10 @@ def stream_direct():
 
 
 CHANGELOG
+
 JUL 17 :
-- Added two methods => as_image , as_mjpeg, as_flask_mjpeg
-- Performance improvment
+- Added four methods => as_image , as_mjpeg, as_flask_mjpeg, as_flask_image 
+- Performance improvement
 - Trying to be as pep8 possible.
 
 JUL 10 :

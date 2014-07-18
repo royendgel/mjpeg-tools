@@ -6,13 +6,12 @@ import StringIO
 
 class MjpegParser(object):
   def __init__(self, url, **kwargs):
-    # for now it's always true
     self.pil = True
     self.quality = 50
     self.format = 'jpeg'
     self.input = urllib2.urlopen(url)
     self.length = 0
-    # mimic the same data
+    # mimic the same data as the origin input, good if you are streaming as-is
     self.data = ''
     self.headers = self.get_headers()
 
@@ -34,16 +33,30 @@ class MjpegParser(object):
         content = self.input.readline()
         data = self.input.read(content_length)
         self.data += content # Slow need to use join instead (pep8 Style)
+        self.output = StringIO.StringIO()
+        self.length = self.output.len
+        self.filename = 'cameraphoto.jpg'
 
       if self.pil:
           from PIL import Image
-          self.output = StringIO.StringIO()
-          im = Image.open(io.BytesIO(data))
-          im.save(self.output, format=self.format, quality=self.quality)
+          self.im = Image.open(io.BytesIO(data))
+          # if you need to do more changes to the image use overide the image_manipulator
+          self.image_manipulator(self.im)
+          self.im.save(self.output, format=self.format, quality=self.quality)
           self.output.seek(0)
-          # it return file-like object in memory
-          self.length = self.output.len
-          return self
+      else:
+        self.output.write(data)
+        self.output.seek(0)
+      self.length = self.output.len
+      return self
+
+  def image_manipulator(self, image):
+    '''You can manipulate your image here in example :
+    from PIL import ImageDraw
+    draw = ImageDraw.Draw(self.im)
+    draw.text((0, 0), str(time.ctime()) + " Your Camera name : " , (255, 255, 255))
+    '''
+    pass
 
   def as_mjpeg(self):
     def generate():
@@ -66,6 +79,12 @@ class MjpegParser(object):
     content_type='multipart/x-mixed-replace;boundary=ipcamera',\
     direct_passthrough=True)
     return resp
+
+  def as_flask_image(self):
+    from flask import send_file
+    return send_file(self.output,
+                     attachment_filename=self.filename,
+                     as_attachment=True)
 
   def as_image(self):
     return self.output
