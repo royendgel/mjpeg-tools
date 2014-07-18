@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name = "mjpeg-tools",
-    version = "0.0.5",
+    version = "0.0.6",
     author = "Royendgel Silberie",
     author_email = "royendgel@techprocur.com",
     description = ("mjpeg client, server and manipulator"),
