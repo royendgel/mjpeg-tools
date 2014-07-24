@@ -57,8 +57,11 @@ def stream_direct():
 
 CHANGELOG
 
+JUL 23:
+Fixed , now working also with dlink dcs-900
+
 JUL 17 :
-- Added four methods => as_image , as_mjpeg, as_flask_mjpeg, as_flask_image 
+- Added four methods => as_image , as_mjpeg, as_flask_mjpeg, as_flask_image
 - Performance improvement
 - Trying to be as pep8 possible.
 

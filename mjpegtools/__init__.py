@@ -7,7 +7,7 @@ import StringIO
 class MjpegParser(object):
   def __init__(self, url, **kwargs):
     self.pil = True
-    self.quality = 50
+    self.quality = 40
     self.format = 'jpeg'
     self.input = urllib2.urlopen(url)
     self.length = 0
@@ -15,41 +15,55 @@ class MjpegParser(object):
     self.data = ''
     self.headers = self.get_headers()
 
+  # Default headers when serving to the client as mjpeg
   def get_headers(self):
     return '\r\n' + '--ipcamera\r\n' + 'Content-Length: ' + str(self.length) +  '\r\n' + 'Content-Type: image/jpeg\r\n' + '\r\n'
 
   def serve(self):
-    while True:
-      regex = re.compile("\d+")
-      content_length = 0
-      content = ''
-      self.data = ''
-      while content_length == 0:
-        if 'Content-Length'.lower() in content.lower():
-          length = regex.findall(content)
-          if len(length) >= 1:
-            content_length = int(length[0])
-            self.length = content_length
-        content = self.input.readline()
-        data = self.input.read(content_length)
-        self.data += content # Slow need to use join instead (pep8 Style)
-        self.output = StringIO.StringIO()
-        self.length = self.output.len
-        self.filename = 'cameraphoto.jpg'
+    # Regex for digits in content-length
+    regex = re.compile("\d+")
+    # Declare some empty vars with init values for while loop.
+    content_length = 0
+    content_type = 0
+    content = ''
+    self.data = ''
 
-      if self.pil:
-          from PIL import Image
-          self.im = Image.open(io.BytesIO(data))
-          # if you need to do more changes to the image use overide the image_manipulator
-          self.image_manipulator(self.im)
-          self.im.save(self.output, format=self.format, quality=self.quality)
-          self.output.seek(0)
-      else:
-        self.output.write(data)
-        self.output.seek(0)
-      self.length = self.output.len
-      return self
+    # loop until it has , content_length and content-type
+    while content_length == 0 or content_type == 0:
+      # pick up the content-length.
+      if 'content-length' in content.lower():
+        length = regex.findall(content)
+        if len(length) >= 1:
+          content_length = int(length[0])
+          self.length = content_length
+      if 'content-type' in content.lower():
+        content_type = 1
 
+      # Nothing found startover.
+      content = self.input.readline()
+
+    data = self.input.read(content_length)
+    self.data += content # Slow need to use join instead (pep8 Style)
+    self.output = StringIO.StringIO()
+    self.length = self.output.len
+    self.filename = 'cameraphoto.jpg'
+
+    # if pil is enabled (by default enabled).
+    if self.pil:
+      from PIL import Image
+      self.im = Image.open(io.BytesIO(data))
+      # if you need to do more changes to the image use overide the image_manipulator
+      self.image_manipulator(self.im)
+      self.im.save(self.output, format=self.format, quality=self.quality)
+      self.output.seek(0)
+
+    else:
+      self.output.write(data)
+      self.output.seek(0)
+    self.length = self.output.len
+    return self
+
+  # Overide this method to do more image manipulations
   def image_manipulator(self, image):
     '''You can manipulate your image here in example :
     from PIL import ImageDraw
