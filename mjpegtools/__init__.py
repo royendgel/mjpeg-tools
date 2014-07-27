@@ -3,13 +3,27 @@ import io
 import re
 import time
 import StringIO
+import logging
 
 class MjpegParser(object):
   def __init__(self, url, **kwargs):
     self.pil = True
-    self.quality = 40
+    self.quality = 50
     self.format = 'jpeg'
-    self.input = urllib2.urlopen(url)
+    self.input = ''
+    self.timeout = 1
+    self.ping = False
+
+    try:
+      logging.debug("Now trying to open the connection to the camera")
+      self.input = urllib2.urlopen(url, self.timeout)
+      self.ping = True
+    except:
+      # maybe I should raise an exception here ???
+      # raise Exception('The camera is offline or the url is not good')
+      logging.error("The camera is offline or the url is not good")
+      self.ping = False
+
     self.length = 0
     # mimic the same data as the origin input, good if you are streaming as-is
     self.data = ''
@@ -28,8 +42,9 @@ class MjpegParser(object):
     content = ''
     self.data = ''
 
-    # loop until it has , content_length and content-type
+    # loop until it contains: content_length and content-type
     while content_length == 0 or content_type == 0:
+
       # pick up the content-length.
       if 'content-length' in content.lower():
         length = regex.findall(content)
@@ -41,6 +56,7 @@ class MjpegParser(object):
 
       # Nothing found startover.
       content = self.input.readline()
+      logging.log("data ==> %s", content)
 
     data = self.input.read(content_length)
     self.data += content # Slow need to use join instead (pep8 Style)
