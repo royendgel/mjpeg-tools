@@ -10,8 +10,9 @@ class MjpegParser(object):
     self.pil = True
     self.quality = 50
     self.format = 'jpeg'
+    self.timeout= 2
     try:
-      self.input = urllib2.urlopen(url)
+      self.input = urllib2.urlopen(url, timeout=timeout)
       self.ping = True
     except:
       logging.error('input error')
