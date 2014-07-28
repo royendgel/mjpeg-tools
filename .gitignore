@@ -8,3 +8,4 @@ distbuild
 build
 dist
 mjpeg-tools-*
+env/

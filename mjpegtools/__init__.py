@@ -3,24 +3,33 @@ import io
 import re
 import time
 import StringIO
+import logging
 
 class MjpegParser(object):
   def __init__(self, url, **kwargs):
     self.pil = True
-    self.quality = 40
+    self.quality = 50
     self.format = 'jpeg'
-    self.input = urllib2.urlopen(url)
+    try:
+      self.input = urllib2.urlopen(url)
+      self.ping = True
+    except:
+      logging.error('input error')
+      self.ping = False
+
     self.length = 0
-    # mimic the same data as the origin input, good if you are streaming as-is
+    # Mimic the same data as the origin input, good if you are streaming as-is.
     self.data = ''
     self.headers = self.get_headers()
 
+
   # Default headers when serving to the client as mjpeg
   def get_headers(self):
-    return '\r\n' + '--ipcamera\r\n' + 'Content-Length: ' + str(self.length) +  '\r\n' + 'Content-Type: image/jpeg\r\n' + '\r\n'
+    return '\r\n' + '--ipcamera\r\n' + 'Content-Length: ' + str(self.length) + \
+    '\r\n' + 'Content-Type: image/jpeg\r\n' + '\r\n'
 
   def serve(self):
-    # Regex for digits in content-length
+    # Regex for digits in content-length.
     regex = re.compile("\d+")
     # Declare some empty vars with init values for while loop.
     content_length = 0
@@ -28,9 +37,10 @@ class MjpegParser(object):
     content = ''
     self.data = ''
 
-    # loop until it has , content_length and content-type
+
+    # loop until it contains: content_length and content-type
     while content_length == 0 or content_type == 0:
-      # pick up the content-length.
+      # Pick up the content-length.
       if 'content-length' in content.lower():
         length = regex.findall(content)
         if len(length) >= 1:
@@ -43,7 +53,7 @@ class MjpegParser(object):
       content = self.input.readline()
 
     data = self.input.read(content_length)
-    self.data += content # Slow need to use join instead (pep8 Style)
+    self.data += content # Slow need to use join instead (pep8 Style).
     self.output = StringIO.StringIO()
     self.length = self.output.len
     self.filename = 'cameraphoto.jpg'
@@ -52,7 +62,8 @@ class MjpegParser(object):
     if self.pil:
       from PIL import Image
       self.im = Image.open(io.BytesIO(data))
-      # if you need to do more changes to the image use overide the image_manipulator
+      # If you need to do more changes to the image.
+      # Use overide the image_manipulator.
       self.image_manipulator(self.im)
       self.im.save(self.output, format=self.format, quality=self.quality)
       self.output.seek(0)
@@ -63,12 +74,13 @@ class MjpegParser(object):
     self.length = self.output.len
     return self
 
-  # Overide this method to do more image manipulations
+  # Overide this method to do more image manipulations.
   def image_manipulator(self, image):
     '''You can manipulate your image here in example :
     from PIL import ImageDraw
     draw = ImageDraw.Draw(self.im)
-    draw.text((0, 0), str(time.ctime()) + " Your Camera name : " , (255, 255, 255))
+    draw.text((0, 0), str(time.ctime()) + " Your Camera name : " \
+    , (255, 255, 255))
     '''
     pass
 

@@ -29,7 +29,15 @@ class TestMjpegTools(unittest.TestCase):
     self.assertIsNot(image1.len, image3.len)
     self.assertEqual(image1.len, image4.len)
 
+  def test_camera_ping_wrong(self):
+    wrong_url = MjpegParser(url=self.url + 'wrong-url')
+    self.assertFalse(wrong_url.ping, msg="The Camera url is correct \
+    it should not be ")
 
+  def test_camera_ping_correct(self):
+    correct_url = MjpegParser(url=self.url)
+    self.assertTrue(correct_url.ping, msg="The camera url is not \
+     correct it should be")
 
 if __name__ == '__main__':
     unittest.main()

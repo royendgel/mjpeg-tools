@@ -48,13 +48,13 @@ Use generator.
 if you are using Django you can use *HttpResponse*
 ### flask you can use as_flask_mjpeg:
 
-`
+```
 @app.route('/direct-stream')
 def stream_direct():
   cam = MjpegParser(url='http://youripadress/videostream.cgi?user=admin&pwd=password&resolution=8&rate=0')
   cam.quality = 20
   return cam.serve().as_flask_mjpeg()
-  `
+```
 
 
 CHANGELOG
