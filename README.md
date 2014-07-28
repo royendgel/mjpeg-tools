@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/royendgel/mjpeg-tools.svg?branch=master)](https://travis-ci.org/royendgel/mjpeg-tools)
+
 MJPEG TOOLS
 ===========
 
@@ -57,8 +59,12 @@ def stream_direct():
 
 CHANGELOG
 
+JUL 27:
+- Tests
+- Travis
+
 JUL 23:
-Fixed , now working also with dlink dcs-900
+- Fixed , now working also with dlink dcs-900
 
 JUL 17 :
 - Added four methods => as_image , as_mjpeg, as_flask_mjpeg, as_flask_image
