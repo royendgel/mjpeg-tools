@@ -59,6 +59,9 @@ def stream_direct():
 
 CHANGELOG
 
+DEC 13, 2014:
+- Fix README examples.
+
 JUL 27:
 - Tests
 - Travis
