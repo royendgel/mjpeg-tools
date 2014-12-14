@@ -29,7 +29,7 @@ to grab a single frame from mjpeg and save it to disk :
 from mjpegtools import MjpegParser
 image = MjpegParser(url='http://path-to-your-camera-mjpeg').serve()
 with open('imagename.jpg', 'wb') as im:
-  im.write(image.read())
+  im.write(image.output.read())
 ```
 
 to simply grab infinite frames from mjpeg and save it to disk  I would do:
@@ -40,7 +40,7 @@ While True:
   filename = str(time()).replace('.','') + '.' + 'jpeg'
   image = MjpegParser(url='http://path-to-your-camera-mjpeg').serve()
   with open(filename, 'wb') as im:
-    im.write(image.read())
+    im.write(image.output.read())
 ```
 
 ### Website
