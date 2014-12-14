@@ -4,15 +4,25 @@ import re
 import time
 import StringIO
 import logging
+from base64 import b64encode
 
 class MjpegParser(object):
-  def __init__(self, url, **kwargs):
+  def __init__(self, url, auth=None, timeout=2):
+    """
+    :param url: The url
+    :param auth: A tuple containing username, password for basic
+                 auth, or none if no auth needed.
+    :param timeout: The timeout value for urllib.urlopen().
+    """
     self.pil = True
     self.quality = 50
     self.format = 'jpeg'
-    self.timeout= 2
+    self.timeout= timeout
+    request = urllib2.Request(url)
     try:
-      self.input = urllib2.urlopen(url, timeout=self.timeout)
+      if auth:
+        request.add_header('Authorization', 'Basic ' + b64encode(auth[0] + ':' + auth[1]) )
+      self.input = urllib2.urlopen(request, timeout=self.timeout)
       self.ping = True
     except:
       logging.error('input error')
