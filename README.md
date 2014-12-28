@@ -59,6 +59,12 @@ def stream_direct():
 
 CHANGELOG
 
+DEC 28, 2014
+- Merged Pull requests (@inactivist)
+- Updated pip.
+- version changed to 0.0.13
+- Added License file
+
 DEC 13, 2014:
 - Fix README examples.
 
