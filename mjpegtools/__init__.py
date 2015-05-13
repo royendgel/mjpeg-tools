@@ -54,7 +54,7 @@ class MjpegParser(object):
 
     # loop until it contains: content_length and content-type
     while content_length == 0 or content_type == 0:
-      print(content)
+      #print(content)
       # Pick up the content-length.
       if b'content-length' in content.lower():
         length = regex.findall(content)
