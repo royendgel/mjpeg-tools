@@ -24,10 +24,15 @@ class TestMjpegTools(unittest.TestCase):
     image2 = self.get_single_image(quality=80)
     image3 = self.get_single_image(quality=20)
     image4 = self.get_single_image(quality=50)
-    self.assertIsNot(image1.len, image2.len)
-    self.assertIsNot(image2.len, image3.len)
-    self.assertIsNot(image1.len, image3.len)
-    self.assertEqual(image1.len, image4.len)
+    
+    len1=image1.seek(0, os.SEEK_END).tell()
+    len2=image2.seek(0, os.SEEK_END).tell()
+    len3=image3.seek(0, os.SEEK_END).tell()
+    len4=image4.seek(0, os.SEEK_END).tell()
+    self.assertIsNot(len1, len2)
+    self.assertIsNot(len2, len3)
+    self.assertIsNot(len1, len3)
+    self.assertEqual(len1, len4)
 
   def test_camera_ping_wrong(self):
     wrong_url = MjpegParser(url=self.url + 'wrong-url')
