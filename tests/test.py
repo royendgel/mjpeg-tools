@@ -16,7 +16,8 @@ class TestMjpegTools(unittest.TestCase):
 
   def test_single_image_parser(self):
     image = self.get_single_image()
-    self.assertIsNot(0, image.len)
+    image.seek(0,os.SEEK_END); lenimg=image.tell()
+    self.assertIsNot(0, lenimg)
 
   def test_single_image_different_quality(self):
     # Test different sizes of image
@@ -25,10 +26,10 @@ class TestMjpegTools(unittest.TestCase):
     image3 = self.get_single_image(quality=20)
     image4 = self.get_single_image(quality=50)
     
-    len1=image1.seek(0, os.SEEK_END).tell()
-    len2=image2.seek(0, os.SEEK_END).tell()
-    len3=image3.seek(0, os.SEEK_END).tell()
-    len4=image4.seek(0, os.SEEK_END).tell()
+    image1.seek(0, os.SEEK_END); len1=image1.tell()
+    image2.seek(0, os.SEEK_END); len2=image2.tell()
+    image3.seek(0, os.SEEK_END); len3=image3.tell()
+    image4.seek(0, os.SEEK_END); len4=image4.tell()
     self.assertIsNot(len1, len2)
     self.assertIsNot(len2, len3)
     self.assertIsNot(len1, len3)
